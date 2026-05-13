@@ -3,207 +3,300 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stay Focused — Block distractions. Do the work.</title>
-  <meta name="description" content="A Chrome extension that blocks distracting websites with PIN protection, scheduling, and an activity log to hold you accountable.">
+  <title>Stay Focused</title>
+  <meta name="description" content="A Chrome extension that blocks distracting websites. PIN-locked, scheduled, and logged.">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    :root {
-      --bg: #000;
-      --fg: #fff;
-      --muted: #444;
-      --subtle: #1a1a1a;
-    }
-
     body {
-      background: var(--bg);
-      color: var(--fg);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      line-height: 1.6;
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    a { color: inherit; }
-
-    /* NAV */
+    /* ── NAV ── */
     nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 24px 40px;
-      border-bottom: 1px solid #111;
+      padding: 20px 32px;
+      mix-blend-mode: difference;
     }
-    .nav-logo { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
-    .nav-link {
+    .nav-logo {
       font-size: 13px;
-      color: var(--muted);
-      text-decoration: none;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: #fff;
     }
-    .nav-link:hover { color: var(--fg); }
-
-    /* HERO */
-    .hero {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 120px 24px 100px;
-      border-bottom: 1px solid #111;
-    }
-    .hero h1 {
-      font-size: clamp(3.5rem, 10vw, 8rem);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1;
-      margin-bottom: 28px;
-    }
-    .hero p {
-      font-size: clamp(1rem, 2.5vw, 1.25rem);
-      color: var(--muted);
-      max-width: 480px;
-      margin-bottom: 48px;
-    }
-    .btn-chrome {
-      display: inline-block;
-      background: var(--fg);
-      color: var(--bg);
-      text-decoration: none;
-      padding: 14px 32px;
-      border-radius: 6px;
-      font-size: 15px;
-      font-weight: 600;
-      transition: background 0.15s;
-    }
-    .btn-chrome:hover { background: #ddd; }
-
-    /* FEATURES */
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      border-bottom: 1px solid #111;
-    }
-    .feature {
-      padding: 48px 40px;
-      border-right: 1px solid #111;
-    }
-    .feature:last-child { border-right: none; }
-    .feature-icon {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    .feature h3 {
-      font-size: 17px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      letter-spacing: -0.01em;
-    }
-    .feature p {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    /* BLOCK PREVIEW */
-    .preview {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 100px 24px;
-      text-align: center;
-      border-bottom: 1px solid #111;
-      background: #050505;
-    }
-    .preview-window {
-      border: 1px solid #1e1e1e;
-      border-radius: 10px;
-      overflow: hidden;
-      width: 100%;
-      max-width: 640px;
-    }
-    .preview-bar {
-      background: #111;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .dot { width: 10px; height: 10px; border-radius: 50%; background: #2a2a2a; }
-    .preview-url {
-      flex: 1;
-      text-align: center;
+    .nav-cta {
       font-size: 12px;
-      color: #333;
+      font-weight: 500;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border-bottom: 1px solid #333;
+      padding-bottom: 1px;
+      transition: border-color 0.2s;
     }
-    .preview-content {
-      background: #000;
-      padding: 80px 24px;
+    .nav-cta:hover { border-color: #fff; }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 16px;
+      justify-content: flex-end;
+      padding: 0 32px 56px;
+      position: relative;
     }
-    .preview-headline {
-      font-size: clamp(2rem, 6vw, 3.5rem);
+    .hero-headline {
+      font-size: clamp(4rem, 14vw, 14rem);
       font-weight: 700;
-      letter-spacing: -0.02em;
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      text-transform: lowercase;
     }
-    .preview-time { font-size: 1.1rem; color: #444; }
-    .preview-count { font-size: 11px; color: #222; letter-spacing: 0.1em; text-transform: uppercase; }
-    .preview-label {
-      margin-top: 32px;
+    .hero-headline span {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1px #333;
+      transition: color 0.3s, -webkit-text-stroke 0.3s;
+    }
+    .hero-headline span:hover {
+      color: #fff;
+      -webkit-text-stroke: 1px transparent;
+    }
+    .hero-sub {
+      margin-top: 40px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 40px;
+    }
+    .hero-copy {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: #555;
+      line-height: 1.6;
+      max-width: 420px;
+    }
+    .hero-copy em {
+      font-style: normal;
+      color: #888;
+    }
+    .hero-btn {
+      display: inline-block;
+      flex-shrink: 0;
+      background: #fff;
+      color: #000;
+      text-decoration: none;
+      padding: 14px 28px;
       font-size: 13px;
-      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .hero-btn:hover { background: #ccc; }
+
+    /* ── TICKER ── */
+    .ticker {
+      border-top: 1px solid #111;
+      border-bottom: 1px solid #111;
+      overflow: hidden;
+      padding: 14px 0;
+      position: relative;
+    }
+    .ticker-track {
+      display: flex;
+      gap: 0;
+      animation: ticker 30s linear infinite;
+      white-space: nowrap;
+    }
+    .ticker-track:hover { animation-play-state: paused; }
+    .ticker-item {
+      font-size: 12px;
+      color: #2a2a2a;
+      letter-spacing: 0.08em;
+      padding: 0 28px;
+      border-right: 1px solid #1a1a1a;
+      flex-shrink: 0;
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
     }
 
-    /* SITES */
-    .sites {
-      padding: 80px 40px;
+    /* ── STATEMENT ── */
+    .statement {
+      padding: 120px 32px;
       border-bottom: 1px solid #111;
     }
-    .sites-label {
+    .statement-text {
+      font-size: clamp(1.6rem, 4vw, 3rem);
+      font-weight: 400;
+      line-height: 1.4;
+      letter-spacing: -0.02em;
+      color: #888;
+      max-width: 800px;
+    }
+    .statement-text strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* ── BLOCK PREVIEW ── */
+    .preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid #111;
+    }
+    .preview-left {
+      padding: 80px 32px;
+      border-right: 1px solid #111;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .preview-label {
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      margin-bottom: 28px;
+      letter-spacing: 0.12em;
+      color: #333;
+      margin-bottom: 32px;
     }
-    .sites-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+    .preview-label-big {
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+      margin-bottom: 20px;
     }
-    .site-tag {
-      font-size: 13px;
+    .preview-desc {
+      font-size: 14px;
       color: #555;
-      background: #0d0d0d;
-      border: 1px solid #1a1a1a;
-      padding: 5px 12px;
-      border-radius: 4px;
+      line-height: 1.7;
+    }
+    .preview-right {
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 80px 32px;
+      text-align: center;
+      gap: 16px;
+      border-left: 1px solid #111;
+    }
+    .mock-headline {
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .mock-time {
+      font-size: 1.1rem;
+      color: #444;
+      font-variant-numeric: tabular-nums;
+    }
+    .mock-count {
+      font-size: 11px;
+      color: #222;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .preview-url-bar {
+      font-size: 11px;
+      color: #1a1a1a;
+      letter-spacing: 0.05em;
+      position: absolute;
+      top: 20px;
     }
 
-    /* FOOTER */
+    /* ── STATS ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-bottom: 1px solid #111;
+    }
+    .stat {
+      padding: 60px 32px;
+      border-right: 1px solid #111;
+    }
+    .stat:last-child { border-right: none; }
+    .stat-num {
+      font-size: clamp(3rem, 6vw, 5rem);
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .stat-desc {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.6;
+    }
+
+    /* ── HOW ── */
+    .how {
+      border-bottom: 1px solid #111;
+    }
+    .how-row {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      align-items: start;
+      padding: 48px 32px;
+      border-bottom: 1px solid #0d0d0d;
+      gap: 0;
+    }
+    .how-row:last-child { border-bottom: none; }
+    .how-num {
+      font-size: 12px;
+      color: #2a2a2a;
+      padding-top: 6px;
+      letter-spacing: 0.06em;
+    }
+    .how-content h3 {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+    .how-content p {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.7;
+      max-width: 480px;
+    }
+
+    /* ── FOOTER ── */
     footer {
-      padding: 40px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
-      color: var(--muted);
+      padding: 28px 32px;
+      font-size: 12px;
+      color: #333;
       flex-wrap: wrap;
       gap: 12px;
     }
-    footer a { color: var(--muted); text-decoration: none; }
-    footer a:hover { color: var(--fg); }
+    footer a { color: #333; text-decoration: none; }
+    footer a:hover { color: #fff; }
 
-    @media (max-width: 640px) {
-      nav { padding: 20px; }
-      .features { grid-template-columns: 1fr; }
-      .feature { border-right: none; border-bottom: 1px solid #111; }
-      .feature:last-child { border-bottom: none; }
-      .sites { padding: 60px 20px; }
-      footer { padding: 32px 20px; flex-direction: column; align-items: flex-start; }
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .hero-sub { flex-direction: column; align-items: flex-start; }
+      .preview { grid-template-columns: 1fr; }
+      .preview-left { border-right: none; border-bottom: 1px solid #111; }
+      .preview-right { border-left: none; }
+      .stats { grid-template-columns: 1fr; }
+      .stat { border-right: none; border-bottom: 1px solid #111; }
+      .stat:last-child { border-bottom: none; }
     }
   </style>
 </head>
@@ -211,81 +304,115 @@
 
   <nav>
     <span class="nav-logo">stay focused</span>
-    <a class="nav-link" href="privacy.html">Privacy</a>
+    <a class="nav-cta" href="https://chrome.google.com/webstore" target="_blank">Add to Chrome →</a>
   </nav>
 
+  <!-- HERO -->
   <section class="hero">
-    <h1>stay focused.</h1>
-    <p>A Chrome extension that blocks distracting websites and holds you accountable with a real activity log.</p>
-    <a class="btn-chrome" href="https://chrome.google.com/webstore" target="_blank">Add to Chrome — it's free</a>
-  </section>
-
-  <section class="features">
-    <div class="feature">
-      <div class="feature-icon">🔒</div>
-      <h3>PIN protected</h3>
-      <p>Lock your settings behind a PIN so you can't undo them on impulse. Adding sites is always allowed — removing them isn't.</p>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">⏱</div>
-      <h3>Pause friction</h3>
-      <p>Want to disable blocking? There's a mandatory 10-minute delay. Enough time to think twice.</p>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">📅</div>
-      <h3>Schedule</h3>
-      <p>Only block during the hours you set — like 9am to 5pm. Blocking turns off automatically outside your window.</p>
-    </div>
-    <div class="feature">
-      <div class="feature-icon">📊</div>
-      <h3>Activity log</h3>
-      <p>See exactly which sites you tried to visit, how many times, and when you paused. The record is the point.</p>
+    <h1 class="hero-headline">
+      <span>stay</span>
+      <span>focused</span>
+    </h1>
+    <div class="hero-sub">
+      <p class="hero-copy">
+        The internet is <em>engineered to waste your time.</em>
+        Every tab, every notification, every autoplay.
+        This puts a wall between you and all of it.
+      </p>
+      <a class="hero-btn" href="https://chrome.google.com/webstore" target="_blank">Add to Chrome — Free</a>
     </div>
   </section>
 
+  <!-- TICKER -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span class="ticker-item">youtube.com</span><span class="ticker-item">reddit.com</span><span class="ticker-item">twitter.com</span><span class="ticker-item">instagram.com</span><span class="ticker-item">tiktok.com</span><span class="ticker-item">netflix.com</span><span class="ticker-item">twitch.tv</span><span class="ticker-item">discord.com</span><span class="ticker-item">roblox.com</span><span class="ticker-item">steam.com</span><span class="ticker-item">facebook.com</span><span class="ticker-item">snapchat.com</span><span class="ticker-item">9gag.com</span><span class="ticker-item">pinterest.com</span><span class="ticker-item">imgur.com</span><span class="ticker-item">hulu.com</span><span class="ticker-item">disneyplus.com</span><span class="ticker-item">buzzfeed.com</span>
+      <!-- duplicate for seamless loop -->
+      <span class="ticker-item">youtube.com</span><span class="ticker-item">reddit.com</span><span class="ticker-item">twitter.com</span><span class="ticker-item">instagram.com</span><span class="ticker-item">tiktok.com</span><span class="ticker-item">netflix.com</span><span class="ticker-item">twitch.tv</span><span class="ticker-item">discord.com</span><span class="ticker-item">roblox.com</span><span class="ticker-item">steam.com</span><span class="ticker-item">facebook.com</span><span class="ticker-item">snapchat.com</span><span class="ticker-item">9gag.com</span><span class="ticker-item">pinterest.com</span><span class="ticker-item">imgur.com</span><span class="ticker-item">hulu.com</span><span class="ticker-item">disneyplus.com</span><span class="ticker-item">buzzfeed.com</span>
+    </div>
+  </div>
+
+  <!-- STATEMENT -->
+  <section class="statement">
+    <p class="statement-text">
+      Willpower alone doesn't work.
+      <strong>Stay Focused adds structure</strong> — a locked block list,
+      a mandatory delay before you can disable it,
+      and a log of every site you tried to visit.
+      <strong>The record is the point.</strong>
+    </p>
+  </section>
+
+  <!-- PREVIEW -->
   <section class="preview">
-    <div class="preview-window">
-      <div class="preview-bar">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <span class="preview-url">youtube.com</span>
-      </div>
-      <div class="preview-content">
-        <div class="preview-headline">stay focused</div>
-        <div class="preview-time">2:34:07 PM</div>
-        <div class="preview-count">8 blocks today</div>
-      </div>
+    <div class="preview-left">
+      <div class="preview-label">What they see</div>
+      <div class="preview-label-big">No feed.<br>No autoplay.<br>Just this.</div>
+      <p class="preview-desc">
+        Every blocked site gets replaced with a full-screen wall.
+        Your site, the time, and how many times you've tried today.
+      </p>
     </div>
-    <p class="preview-label">What you see instead of YouTube.</p>
+    <div class="preview-right" style="position:relative">
+      <span class="preview-url-bar">youtube.com</span>
+      <div class="mock-headline">stay focused</div>
+      <div class="mock-time">2:34:07 PM</div>
+      <div class="mock-count">8 blocks today</div>
+    </div>
   </section>
 
-  <section class="sites">
-    <div class="sites-label">Blocks 50+ sites by default</div>
-    <div class="sites-grid">
-      <span class="site-tag">youtube.com</span>
-      <span class="site-tag">reddit.com</span>
-      <span class="site-tag">twitter.com</span>
-      <span class="site-tag">instagram.com</span>
-      <span class="site-tag">tiktok.com</span>
-      <span class="site-tag">netflix.com</span>
-      <span class="site-tag">twitch.tv</span>
-      <span class="site-tag">discord.com</span>
-      <span class="site-tag">roblox.com</span>
-      <span class="site-tag">steam.com</span>
-      <span class="site-tag">facebook.com</span>
-      <span class="site-tag">9gag.com</span>
-      <span class="site-tag">imgur.com</span>
-      <span class="site-tag">pinterest.com</span>
-      <span class="site-tag">snapchat.com</span>
-      <span class="site-tag">+ add any site</span>
+  <!-- STATS -->
+  <section class="stats">
+    <div class="stat">
+      <div class="stat-num">50+</div>
+      <div class="stat-desc">sites blocked by default.<br>Add any site in one click.</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">10 min</div>
+      <div class="stat-desc">mandatory wait before blocking pauses.<br>Enough time to think twice.</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">0</div>
+      <div class="stat-desc">bytes of data sent anywhere.<br>Everything stays on your device.</div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how">
+    <div class="how-row">
+      <span class="how-num">01</span>
+      <div class="how-content">
+        <h3>Block any site.</h3>
+        <p>Type a domain and it's blocked instantly — on every subpage, across every tab. Comes pre-loaded with 50+ of the worst offenders.</p>
+      </div>
+    </div>
+    <div class="how-row">
+      <span class="how-num">02</span>
+      <div class="how-content">
+        <h3>Lock it with a PIN.</h3>
+        <p>Settings are protected. You can always add more sites. Removing them requires your PIN — so impulsive decisions stay in check.</p>
+      </div>
+    </div>
+    <div class="how-row">
+      <span class="how-num">03</span>
+      <div class="how-content">
+        <h3>Set your hours.</h3>
+        <p>Only block during work hours. The schedule enforces itself — no willpower required outside the window you set.</p>
+      </div>
+    </div>
+    <div class="how-row">
+      <span class="how-num">04</span>
+      <div class="how-content">
+        <h3>Check the log.</h3>
+        <p>See which sites you tried to visit, how many times, and when you paused blocking. The data is just for you — it never leaves your device.</p>
+      </div>
     </div>
   </section>
 
   <footer>
     <span>Stay Focused · Free Chrome extension</span>
     <div style="display:flex;gap:24px">
-      <a href="privacy.html">Privacy policy</a>
+      <a href="privacy.html">Privacy</a>
       <a href="https://github.com/roreyshen/Accountability_app" target="_blank">GitHub</a>
     </div>
   </footer>
