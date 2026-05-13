@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stay Focused — Block distractions. Do the work.</title>
+  <meta name="description" content="A Chrome extension that blocks distracting websites with PIN protection, scheduling, and an activity log to hold you accountable.">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #000;
+      --fg: #fff;
+      --muted: #444;
+      --subtle: #1a1a1a;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; }
+
+    /* NAV */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 40px;
+      border-bottom: 1px solid #111;
+    }
+    .nav-logo { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
+    .nav-link {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .nav-link:hover { color: var(--fg); }
+
+    /* HERO */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 100px;
+      border-bottom: 1px solid #111;
+    }
+    .hero h1 {
+      font-size: clamp(3.5rem, 10vw, 8rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 28px;
+    }
+    .hero p {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 48px;
+    }
+    .btn-chrome {
+      display: inline-block;
+      background: var(--fg);
+      color: var(--bg);
+      text-decoration: none;
+      padding: 14px 32px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+    .btn-chrome:hover { background: #ddd; }
+
+    /* FEATURES */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      border-bottom: 1px solid #111;
+    }
+    .feature {
+      padding: 48px 40px;
+      border-right: 1px solid #111;
+    }
+    .feature:last-child { border-right: none; }
+    .feature-icon {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .feature h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .feature p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* BLOCK PREVIEW */
+    .preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 100px 24px;
+      text-align: center;
+      border-bottom: 1px solid #111;
+      background: #050505;
+    }
+    .preview-window {
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 640px;
+    }
+    .preview-bar {
+      background: #111;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: #2a2a2a; }
+    .preview-url {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      color: #333;
+    }
+    .preview-content {
+      background: #000;
+      padding: 80px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .preview-headline {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .preview-time { font-size: 1.1rem; color: #444; }
+    .preview-count { font-size: 11px; color: #222; letter-spacing: 0.1em; text-transform: uppercase; }
+    .preview-label {
+      margin-top: 32px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* SITES */
+    .sites {
+      padding: 80px 40px;
+      border-bottom: 1px solid #111;
+    }
+    .sites-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+    .sites-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .site-tag {
+      font-size: 13px;
+      color: #555;
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
+      padding: 5px 12px;
+      border-radius: 4px;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--fg); }
+
+    @media (max-width: 640px) {
+      nav { padding: 20px; }
+      .features { grid-template-columns: 1fr; }
+      .feature { border-right: none; border-bottom: 1px solid #111; }
+      .feature:last-child { border-bottom: none; }
+      .sites { padding: 60px 20px; }
+      footer { padding: 32px 20px; flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <span class="nav-logo">stay focused</span>
+    <a class="nav-link" href="privacy.html">Privacy</a>
+  </nav>
+
+  <section class="hero">
+    <h1>stay focused.</h1>
+    <p>A Chrome extension that blocks distracting websites and holds you accountable with a real activity log.</p>
+    <a class="btn-chrome" href="https://chrome.google.com/webstore" target="_blank">Add to Chrome — it's free</a>
+  </section>
+
+  <section class="features">
+    <div class="feature">
+      <div class="feature-icon">🔒</div>
+      <h3>PIN protected</h3>
+      <p>Lock your settings behind a PIN so you can't undo them on impulse. Adding sites is always allowed — removing them isn't.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">⏱</div>
+      <h3>Pause friction</h3>
+      <p>Want to disable blocking? There's a mandatory 10-minute delay. Enough time to think twice.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📅</div>
+      <h3>Schedule</h3>
+      <p>Only block during the hours you set — like 9am to 5pm. Blocking turns off automatically outside your window.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📊</div>
+      <h3>Activity log</h3>
+      <p>See exactly which sites you tried to visit, how many times, and when you paused. The record is the point.</p>
+    </div>
+  </section>
+
+  <section class="preview">
+    <div class="preview-window">
+      <div class="preview-bar">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <span class="preview-url">youtube.com</span>
+      </div>
+      <div class="preview-content">
+        <div class="preview-headline">stay focused</div>
+        <div class="preview-time">2:34:07 PM</div>
+        <div class="preview-count">8 blocks today</div>
+      </div>
+    </div>
+    <p class="preview-label">What you see instead of YouTube.</p>
+  </section>
+
+  <section class="sites">
+    <div class="sites-label">Blocks 50+ sites by default</div>
+    <div class="sites-grid">
+      <span class="site-tag">youtube.com</span>
+      <span class="site-tag">reddit.com</span>
+      <span class="site-tag">twitter.com</span>
+      <span class="site-tag">instagram.com</span>
+      <span class="site-tag">tiktok.com</span>
+      <span class="site-tag">netflix.com</span>
+      <span class="site-tag">twitch.tv</span>
+      <span class="site-tag">discord.com</span>
+      <span class="site-tag">roblox.com</span>
+      <span class="site-tag">steam.com</span>
+      <span class="site-tag">facebook.com</span>
+      <span class="site-tag">9gag.com</span>
+      <span class="site-tag">imgur.com</span>
+      <span class="site-tag">pinterest.com</span>
+      <span class="site-tag">snapchat.com</span>
+      <span class="site-tag">+ add any site</span>
+    </div>
+  </section>
+
+  <footer>
+    <span>Stay Focused · Free Chrome extension</span>
+    <div style="display:flex;gap:24px">
+      <a href="privacy.html">Privacy policy</a>
+      <a href="https://github.com/roreyshen/Accountability_app" target="_blank">GitHub</a>
+    </div>
+  </footer>
+
+</body>
+</html>
