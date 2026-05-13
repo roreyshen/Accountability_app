@@ -22,17 +22,19 @@ chrome.storage.sync.get(['blocked', 'schedule', 'pause'], (data) => {
   const host = location.hostname.replace(/^www\./, '');
   if (!blocked.some(d => host === d || host.endsWith('.' + d))) return;
 
-  // Record per-domain block in blockLog
+  // Stop page load immediately so nothing renders
+  window.stop();
+
+  // Write the block entry, then navigate (must be in-callback or data is lost on navigation)
   const today = new Date().toISOString().split('T')[0];
   chrome.storage.local.get({ blockLog: {} }, ({ blockLog }) => {
     const day = blockLog[today] || {};
     day[host] = (day[host] || 0) + 1;
     blockLog[today] = day;
-    chrome.storage.local.set({ blockLog });
+    chrome.storage.local.set({ blockLog }, () => {
+      window.location.replace(
+        chrome.runtime.getURL('blocked.html') + '#' + encodeURIComponent(host)
+      );
+    });
   });
-
-  window.stop();
-  window.location.replace(
-    chrome.runtime.getURL('blocked.html') + '#' + encodeURIComponent(host)
-  );
 });
