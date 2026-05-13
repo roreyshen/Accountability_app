@@ -125,11 +125,21 @@ function renderPause(pause) {
         Blocking paused (~${remMin} min left)
         <button id="resume-btn">Resume now</button>
       </div>`;
-    $('resume-btn').onclick = () => chrome.storage.sync.remove('pause', refreshAll);
+    $('resume-btn').onclick = () => recordAndEndPause(pause, Date.now());
 
   } else {
-    chrome.storage.sync.remove('pause', refreshAll);
+    recordAndEndPause(pause, pause.startedAt + TEN_MIN + PAUSE_DURATION);
   }
+}
+
+function recordAndEndPause(pause, resumedAt) {
+  const entry = { pausedAt: pause.startedAt + TEN_MIN, resumedAt };
+  chrome.storage.local.get({ pauseLog: [] }, ({ pauseLog }) => {
+    pauseLog.unshift(entry);
+    chrome.storage.local.set({ pauseLog: pauseLog.slice(0, 50) }, () =>
+      chrome.storage.sync.remove('pause', refreshAll)
+    );
+  });
 }
 
 function refreshAll() {
@@ -215,3 +225,6 @@ function saveSchedule() {
 
 initHourSelects();
 refreshAll();
+$('stats-link').href = chrome.runtime.getURL('stats.html');
+$('stats-link').onmouseover = () => { $('stats-link').style.color = '#fff'; };
+$('stats-link').onmouseout = () => { $('stats-link').style.color = '#333'; };

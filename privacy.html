@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stay Focused · Privacy Policy</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 64px 24px;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 8px; }
+    .meta { color: #444; font-size: 13px; margin-bottom: 48px; }
+    h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; color: #444; margin: 36px 0 12px; }
+    p { color: #999; margin-bottom: 12px; }
+    ul { color: #999; padding-left: 20px; margin-bottom: 12px; }
+    li { margin-bottom: 4px; }
+    strong { color: #fff; }
+  </style>
+</head>
+<body>
+  <h1>Privacy Policy</h1>
+  <div class="meta">Stay Focused Chrome Extension · Last updated May 2026</div>
+
+  <h2>Summary</h2>
+  <p>Stay Focused does not collect, transmit, or share any data. Everything stays on your device.</p>
+
+  <h2>Data stored locally</h2>
+  <p>The extension stores the following data using Chrome's built-in storage APIs (<code>chrome.storage.sync</code> and <code>chrome.storage.local</code>):</p>
+  <ul>
+    <li><strong>Blocked site list</strong> — the domains you've chosen to block</li>
+    <li><strong>PIN</strong> — your settings lock PIN (stored as plain text in your own browser sync storage)</li>
+    <li><strong>Schedule</strong> — your chosen blocking hours</li>
+    <li><strong>Activity log</strong> — per-domain block counts and pause events, used only to display your own stats</li>
+  </ul>
+
+  <h2>What we do NOT do</h2>
+  <ul>
+    <li>We do not send any data to any server</li>
+    <li>We do not use analytics or tracking</li>
+    <li>We do not have access to your browsing history beyond detecting the current page's domain</li>
+    <li>We do not sell or share any information</li>
+  </ul>
+
+  <h2>chrome.storage.sync</h2>
+  <p>If you are signed into Chrome, <code>chrome.storage.sync</code> data (your block list, PIN, and schedule) may sync across your own devices via your Google account. This sync is handled entirely by Chrome/Google — Stay Focused has no control over or access to this sync process.</p>
+
+  <h2>Permissions</h2>
+  <p>The extension requests the <strong>storage</strong> permission to save your settings and activity data locally. It uses a content script that runs on all URLs solely to check if the current domain is on your block list.</p>
+
+  <h2>Contact</h2>
+  <p>Questions? Open an issue at <a href="https://github.com/roreyshen/Accountability_app" style="color:#555">github.com/roreyshen/Accountability_app</a>.</p>
+</body>
+</html>

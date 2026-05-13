@@ -13,7 +13,6 @@ chrome.storage.sync.get(['blocked', 'schedule', 'pause'], (data) => {
   if (schedule.enabled) {
     const hour = new Date().getHours();
     const { start = 9, end = 17 } = schedule;
-    // Handle overnight ranges (e.g. 22 to 6)
     const inWindow = start <= end
       ? hour >= start && hour < end
       : hour >= start || hour < end;
@@ -23,11 +22,13 @@ chrome.storage.sync.get(['blocked', 'schedule', 'pause'], (data) => {
   const host = location.hostname.replace(/^www\./, '');
   if (!blocked.some(d => host === d || host.endsWith('.' + d))) return;
 
-  // Increment today's block count
+  // Record per-domain block in blockLog
   const today = new Date().toISOString().split('T')[0];
-  chrome.storage.local.get({ blockCounts: {} }, ({ blockCounts }) => {
-    blockCounts[today] = (blockCounts[today] || 0) + 1;
-    chrome.storage.local.set({ blockCounts });
+  chrome.storage.local.get({ blockLog: {} }, ({ blockLog }) => {
+    const day = blockLog[today] || {};
+    day[host] = (day[host] || 0) + 1;
+    blockLog[today] = day;
+    chrome.storage.local.set({ blockLog });
   });
 
   window.stop();

@@ -8,9 +8,10 @@ setInterval(tick, 1000);
 const site = decodeURIComponent(location.hash.slice(1));
 if (site) document.getElementById('site').textContent = site;
 
-// Daily block count
+// Daily block count from blockLog
 const today = new Date().toISOString().split('T')[0];
-chrome.storage.local.get({ blockCounts: {} }, ({ blockCounts }) => {
-  const n = blockCounts[today] || 0;
+chrome.storage.local.get({ blockLog: {} }, ({ blockLog }) => {
+  const day = blockLog[today] || {};
+  const n = Object.values(day).reduce((s, v) => s + v, 0);
   document.getElementById('count').textContent = `${n} block${n !== 1 ? 's' : ''} today`;
 });
